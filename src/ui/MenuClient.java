@@ -17,14 +17,14 @@ public class MenuClient {
     public void afficherMenuClient(){
         int choix = 0;
         do{
-            System.out.println("\n===== Menu Client =====");
+            System.out.println("===== Menu Client =====");
             System.out.println("1. Consulter solde");
             System.out.println("2. Dépôt");
             System.out.println("3. Retrait");
             System.out.println("4. Virement");
             System.out.println("5. Consulter relevé");
-            System.out.println("6. Déconnexion");
-            System.out.println("\n=======================");
+            System.out.println("6. Quitter");
+            System.out.println("=======================");
             System.out.print("Choix : ");
             choix = scanner.nextInt();
             scanner.nextLine();
@@ -32,14 +32,19 @@ public class MenuClient {
             switch (choix){
                 case 1:
                     consulterSolde();
+                    break;
                 case 2:
                     deposer();
+                    break;
                 case 3 :
-                    // retrait
+                    retrait();
+                    break;
                 case 4:
-                    // verement
+                    virement();
+                    break;
                 case 5 :
-                    // consulter relevé
+                    consulterReleve();
+                    break;
                 case 6:
                     System.out.println("Merci d'avoir utilisé notre application");
                     break;
@@ -50,18 +55,66 @@ public class MenuClient {
     }
 
     private void consulterSolde(){
-        System.out.println("entrez le numéro de compte : ");
+        System.out.println("=== VOS COMPTES DISPONIBLES ===");
+        for(String numeroCompte : client.getComptes().keySet()){
+            System.out.println("• " + numeroCompte);
+        }
+        System.out.println("==============================");
+        
+        System.out.print("entrez le numéro de compte : ");
         String numeroCompte = scanner.nextLine();
         double solde = banqueService.consulterSolde(client, numeroCompte);
         System.out.println("solde du compte : "+solde+" DH");
     }
 
     private void deposer(){
-        System.out.println("entrez le numéro de compte : ");
+        System.out.println("=== VOS COMPTES DISPONIBLES ===");
+        for(String numeroCompte : client.getComptes().keySet()){
+            System.out.println("• " + numeroCompte);
+        }
+        System.out.println("==============================");
+        
+        System.out.print("entrez le numéro de compte : ");
         String numeroCompte = scanner.nextLine();
-        System.out.println("entrez de montant a deposer : ");
+        System.out.print("entrez de montant a deposer : ");
         double montant = scanner.nextDouble();
         banqueService.deposer(client, numeroCompte, montant);
+    }
+
+    private void retrait(){
+        System.out.println("=== VOS COMPTES DISPONIBLES ===");
+        for(String numeroCompte : client.getComptes().keySet()){
+            System.out.println("• " + numeroCompte);
+        }
+        System.out.println("==============================");
+        
+        System.out.print("entrez le numéro de compte : ");
+        String numeroCompte = scanner.nextLine();
+        System.out.print("entrez le montant à retirer : ");
+        double montant = scanner.nextDouble();
+        banqueService.retrait(client, numeroCompte, montant);
+    }
+
+    private void virement(){
+        System.out.print("entrez le numéro de compte source : ");
+        String numeroCompteSource = scanner.nextLine();
+        System.out.print("entrez le numéro de compte destination : ");
+        String numeroCompteDestination = scanner.nextLine();
+        System.out.print("entrez le montant à virer : ");
+        double montant = scanner.nextDouble();
+        banqueService.virement(client, numeroCompteSource, numeroCompteDestination, montant);
+    }
+
+    private void consulterReleve(){
+        System.out.println("=== VOS COMPTES DISPONIBLES ===");
+        for(String numeroCompte : client.getComptes().keySet()){
+            System.out.println("• " + numeroCompte);
+        }
+        System.out.println("==============================");
+        
+        System.out.print("entrez le numéro de compte : ");
+        String numeroCompte = scanner.nextLine();
+        banqueService.consulterReleve(client, numeroCompte);
     }
 
 }

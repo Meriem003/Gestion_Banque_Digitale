@@ -8,13 +8,13 @@ public class MenuGestionnaire {
     public void afficherMenuGestoinnaire(){
     int choix = 0;
     do{
-        System.out.println("\n===== Menu Gestionnaire =====");
+        System.out.println("===== Menu Gestionnaire =====");
         System.out.println("1. Créer compte client");
         System.out.println("2. Modifier infos client");
         System.out.println("3. Clôturer compte client");
         System.out.println("4. Consulter relevé client");
-        System.out.println("5. Déconnexion");
-        System.out.println("\n==============================");
+        System.out.println("5. Quitter");
+        System.out.println("==============================");
         System.out.print("Choix : ");
         choix = scanner.nextInt();
 
