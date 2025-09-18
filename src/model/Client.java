@@ -24,6 +24,6 @@ public class Client extends Personne {
     public void ajouterCompte(Compte compte) {
         comptes.put(compte.getNumeroCompte(), compte);
     }
-    
+
 
 }
