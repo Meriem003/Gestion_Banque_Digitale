@@ -21,7 +21,7 @@ public class AuthUI {
                 case 2:
                     // methode dyal register
                 case 3:
-                    System.out.println("Merci d'avoir utilisé notre banque");
+                    System.out.println("Merci utilisé notre banque");
                     break;
                 default:
                     System.out.println("choix invalide");
