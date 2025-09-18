@@ -7,7 +7,6 @@ public class Client extends Personne {
 
     public Client(String nom, String prenom, String email, String motDePasse){
         super(nom, prenom, email, motDePasse);
-        this.idClient = "CL" + System.currentTimeMillis();
     }
 
     public String getIdClient(){
@@ -21,9 +20,4 @@ public class Client extends Personne {
     public HashMap<String , Compte> getComptes(){
         return comptes;
     }
-    public void ajouterCompte(Compte compte) {
-        comptes.put(compte.getNumeroCompte(), compte);
-    }
-
-
 }

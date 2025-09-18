@@ -18,7 +18,7 @@ public class Compte {
     }
 
     public String getNumeroCompte(){
-        return getNumeroCompte();
+        return numeroComptes;
     }
     public double getSolde(){
         return solde;
@@ -26,5 +26,4 @@ public class Compte {
     public String getTypeCompte(){
         return typeCompte;
     }
-
 }
