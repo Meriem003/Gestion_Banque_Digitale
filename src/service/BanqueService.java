@@ -30,10 +30,25 @@ public class BanqueService {
         if(compte != null){
             return compte.getSolde();
         }else {
-            System.out.println(" !compte ");
+            System.out.println(" compte inexistant ");
             return 0;
         }
     }
+
+    public void deposer(Client client, String numeroCompte, double montant){
+        if(montant <= 0){
+            System.out.println("le montant negative ");
+            return;
+        }
+        Compte compte = client.getComptes().get(numeroCompte);
+        if(compte != null){
+            compte.setSolde(compte.getSolde()+montant);
+            System.out.println("depot reussi");
+        }else{
+            System.out.println("erreur");
+        }
+    }
+    
 
 
 

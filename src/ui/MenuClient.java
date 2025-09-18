@@ -1,9 +1,19 @@
 package ui;
 
+import service.BanqueService;
+import model.Client;
 import java.util.Scanner;
 
 public class MenuClient {
+    private BanqueService banqueService;
+    private Client client;
     private Scanner scanner = new Scanner (System.in);
+
+    public MenuClient(Client client, BanqueService banqueService) {
+        this.client = client;
+        this.banqueService = banqueService;
+    }
+
     public void afficherMenuClient(){
         int choix = 0;
         do{
@@ -21,9 +31,9 @@ public class MenuClient {
 
             switch (choix){
                 case 1:
-                    // consulter
+                    consulterSolde();
                 case 2:
-                    // depos
+                    deposer();
                 case 3 :
                     // retrait
                 case 4:
@@ -38,4 +48,20 @@ public class MenuClient {
             }
         }while (choix !=6);
     }
+
+    private void consulterSolde(){
+        System.out.println("entrez le numéro de compte : ");
+        String numeroCompte = scanner.nextLine();
+        double solde = banqueService.consulterSolde(client, numeroCompte);
+        System.out.println("solde du compte : "+solde+" DH");
+    }
+
+    private void deposer(){
+        System.out.println("entrez le numéro de compte : ");
+        String numeroCompte = scanner.nextLine();
+        System.out.println("entrez de montant a deposer : ");
+        double montant = scanner.nextDouble();
+        banqueService.deposer(client, numeroCompte, montant);
+    }
+
 }

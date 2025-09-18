@@ -26,4 +26,10 @@ public class Compte {
     public String getTypeCompte(){
         return typeCompte;
     }
+
+    public void setSolde(double solde){
+        this.solde = solde;
+    }
+    
+    
 }
