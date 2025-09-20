@@ -76,6 +76,8 @@ public class AuthUI {
         if (nouveauClient != null) {
             System.out.println("Enregistrement réussi !");
             System.out.println("Votre ID Client : " + nouveauClient.getIdClient());
+            MenuClient menuClient = new MenuClient(nouveauClient, banqueService);
+            menuClient.afficherMenuClient();
         } else {
             System.out.println("Erreur : Cet email est déjà utilisé !");
         }
