@@ -31,5 +31,8 @@ public class Compte {
         this.solde = solde;
     }
     
+    public void ajouterTransaction(Transacion transaction) {
+        this.historiquetransacions.add(transaction);
+    }
     
 }

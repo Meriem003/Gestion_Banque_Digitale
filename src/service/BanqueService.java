@@ -4,6 +4,7 @@ import model.Personne;
 import model.Client;
 import model.Gestionnaire;
 import model.Compte;
+import model.Transacion;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
@@ -68,6 +69,9 @@ public class BanqueService {
         }
         double nouveauSolde = compte.getSolde() + montant;
         compte.setSolde(nouveauSolde);
+        String idTransaction = "TXN" + System.currentTimeMillis();
+        Transacion transaction = new Transacion(idTransaction, "DEPOT", montant, null, compte);
+        compte.ajouterTransaction(transaction);
 
         System.out.println("Dépôt de " + montant + " DH effectué avec succès !");
         System.out.println("Nouveau solde : " + nouveauSolde + " DH");
@@ -91,6 +95,10 @@ public class BanqueService {
         }
         double nouveauSolde = compte.getSolde() - montant;
         compte.setSolde(nouveauSolde);
+        String idTransaction = "TXN" + System.currentTimeMillis();
+        Transacion transaction = new Transacion(idTransaction, "RETRAIT", montant, compte, null);
+        compte.ajouterTransaction(transaction);
+
         System.out.println("Retrait effectué avec succès !");
         System.out.println("Nouveau solde : " + nouveauSolde + " DH");
         
