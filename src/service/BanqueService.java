@@ -1,179 +1,167 @@
 package service;
 
+import model.Personne;
 import model.Client;
-import model.Compte;
 import model.Gestionnaire;
-import model.Transacion;
+import model.Compte;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.HashMap;
 
 public class BanqueService {
+    private List<Client> clients = new ArrayList<>();
 
-    private ArrayList<Client> clients = new ArrayList<>();
-    private Gestionnaire gestionnaireDefaut;
-
-
-
-    public BanqueService() {
-        this.gestionnaireDefaut = new Gestionnaire("GEST001", "Admin", "Banque", "admin@banque.com", "admin123");
-    }
-    public Gestionnaire getGestionnaireDefaut() {
-        return gestionnaireDefaut;
-    }
-    public Gestionnaire loginGestionnaire(String email, String motDePasse) {
-        if (gestionnaireDefaut.getEmail().equals(email) && gestionnaireDefaut.getMotDePasse().equals(motDePasse)) {
-            return gestionnaireDefaut;
+    public Personne login(String email, String motDePasse) {
+        if (Gestionnaire.GESTIONNAIRE_DEFAULT.getEmail().equals(email) && 
+            Gestionnaire.GESTIONNAIRE_DEFAULT.getMotDePasse().equals(motDePasse)) {
+            return Gestionnaire.GESTIONNAIRE_DEFAULT;
+        }
+        
+        for (Client client : clients) {
+            if (client.getEmail().equals(email) && 
+                client.getMotDePasse().equals(motDePasse)) {
+                return client;
+            }
         }
         return null;
     }
 
-
-
-
-    public Client creerClient(String nom, String prenom, String email, String motDepasse){
-
-        String idClient = "id"+(clients.size()+1);
-        Client client = new Client(nom, prenom, email, motDepasse);
-        client.setIdClient(idClient);
-
-        String numeroCompte = "ACC"+(clients.size())+"322";
-        Compte compteCourant = new Compte(numeroCompte, "courant");
-
-        client.getComptes().put(numeroCompte,compteCourant);
+    public void ajouterClient(Client client) {
         clients.add(client);
-
-        System.out.println("Compte créé : " + numeroCompte);
-
-        return client;
-    }
-
-
-
-
-
-
-    public double consulterSolde(Client client, String numeroCompte){
-        Compte compte = client.getComptes().get(numeroCompte);
-        if(compte != null){
-            return compte.getSolde();
-        }else {
-            System.out.println(" compte inexistant ");
-            return 0;
-        }
-    }
-
-
-
-    public void deposer(Client client, String numeroCompte, double montant){
-        if(montant <= 0){
-            System.out.println("Le montant doit être positif");
-            return;
-        }
-        Compte compte = client.getComptes().get(numeroCompte);
-        if(compte != null){
-            compte.setSolde(compte.getSolde()+montant);
-            String idTransaction = "TXN" + System.currentTimeMillis() + "DEP";
-            Transacion transaction = new Transacion(idTransaction, "DEPOT", montant, null, compte);
-            compte.getHistoriquetransacions().add(transaction);
-            System.out.println("Dépôt réussi. Nouveau solde: " + compte.getSolde() + " DH");
-        }else{
-            System.out.println("Compte inexistant");
-        }
-    }
-
-
-
-    public void retrait(Client client, String numeroCompte, double montant){
-        if(montant <= 0){
-            System.out.println("Le montant doit être positif");
-            return;
-        }
-        Compte compte = client.getComptes().get(numeroCompte);
-        if(compte != null){
-            if(compte.getSolde() >= montant){
-                compte.setSolde(compte.getSolde() - montant);
-                String idTransaction = "TXN" + System.currentTimeMillis() + "RET";
-                Transacion transaction = new Transacion(idTransaction, "RETRAIT", montant, compte, null);
-                compte.getHistoriquetransacions().add(transaction);
-                System.out.println("Retrait réussi. Nouveau solde: " + compte.getSolde() + " DH");
-            } else {
-                System.out.println("Solde insuffisant. Solde actuel: " + compte.getSolde());
-            }
-        } else {
-            System.out.println("Compte inexistant");
-        }
-    }
-
-
-
-    public void virement(Client clientSource, String numeroCompteSource, String numeroCompteDestination, double montant){
-        if(montant <= 0){
-            System.out.println("Le montant doit être positif");
-            return;
-        }
-        Compte compteSource = clientSource.getComptes().get(numeroCompteSource);
-        if(compteSource == null){
-            System.out.println("Compte source inexistant");
-            return;
-        }
-        if(compteSource.getSolde() < montant){
-            System.out.println("Solde insuffisant. Solde actuel: " + compteSource.getSolde());
-            return;
-        }
-        Compte compteDestination = null;
-        
-        for(Client client : clients){
-            if(client.getComptes().containsKey(numeroCompteDestination)){
-                compteDestination = client.getComptes().get(numeroCompteDestination);
-                break;
-            }
-        }
-        if(compteDestination == null){
-            System.out.println("Compte destination inexistant");
-            return;
-        }
-        compteSource.setSolde(compteSource.getSolde() - montant);
-        compteDestination.setSolde(compteDestination.getSolde() + montant);
-        
-        String idTransactionDebit = "TXN" + System.currentTimeMillis() + "D";
-        String idTransactionCredit = "TXN" + System.currentTimeMillis() + "C";
-        Transacion transactionDebit = new Transacion(idTransactionDebit, "VIREMENT_DEBIT", montant, compteSource, compteDestination);
-        compteSource.getHistoriquetransacions().add(transactionDebit);
-        Transacion transactionCredit = new Transacion(idTransactionCredit, "VIREMENT_CREDIT", montant, compteSource, compteDestination);
-        compteDestination.getHistoriquetransacions().add(transactionCredit);
-        System.out.println("Virement réussi!");
-        System.out.println("Montant transféré: " + montant + " DH");
-    }
-
+    } 
     
+    public Client register(String nom, String prenom, String email, String motDePasse) {
+        Client nouveauClient = new Client(nom, prenom, email, motDePasse);
+        clients.add(nouveauClient);
+        String numeroCompte = genererNumeroCompte();
+        Compte compteParDefaut = new Compte(numeroCompte, "Compte Courant");
+        HashMap<String, Compte> comptes = nouveauClient.getComptes();
+        comptes.put(numeroCompte, compteParDefaut);
+        System.out.println("Compte bancaire par défaut créé : " + numeroCompte);
+        return nouveauClient;
+    }
+    
+    private String genererNumeroCompte() {
+        long timestamp = System.currentTimeMillis();
+        return "CPT" + timestamp;
+    }
+    
+    public double consulterMonSolde(Client client) {
+        double soldeTotal = 0.0;
+        HashMap<String, Compte> comptes = client.getComptes();
+        for (Compte compte : comptes.values()) {
+            soldeTotal += compte.getSolde();
+        }
+        return soldeTotal;
+    }
 
+    public boolean deposer(Client client, String numeroCompte, double montant) {
+        if (montant <= 0) {
+            System.out.println("Erreur : Le montant doit être positif !");
+            return false;
+        }
+        HashMap<String, Compte> comptes = client.getComptes();
+        Compte compte = comptes.get(numeroCompte);
+        if (compte == null) {
+            System.out.println("Erreur : Compte non trouvé !");
+            return false;
+        }
+        double nouveauSolde = compte.getSolde() + montant;
+        compte.setSolde(nouveauSolde);
+
+        System.out.println("Dépôt de " + montant + " DH effectué avec succès !");
+        System.out.println("Nouveau solde : " + nouveauSolde + " DH");
+        return true;
+    }
+    
+    public boolean retrait(Client client, String numeroCompte, double montant) {
+        if (montant <= 0) {
+            System.out.println("Erreur : Le montant doit être positif !");
+            return false;
+        }
+        HashMap<String, Compte> comptes = client.getComptes();
+        Compte compte = comptes.get(numeroCompte);
+        if (compte == null) {
+            System.out.println("Erreur : Compte non trouvé !");
+            return false;
+        }
+        if (compte.getSolde() < montant) {
+            System.out.println("Erreur : Solde insuffisant !");
+            return false;
+        }
+        double nouveauSolde = compte.getSolde() - montant;
+        compte.setSolde(nouveauSolde);
+        System.out.println("Retrait effectué avec succès !");
+        System.out.println("Nouveau solde : " + nouveauSolde + " DH");
+        
+        return true;
+    }
+    
     public void consulterReleve(Client client, String numeroCompte) {
-        Compte compte = client.getComptes().get(numeroCompte);
-        if(compte != null) {
-            System.out.println("\n=== RELEVÉ DE COMPTE " + numeroCompte + " ===");
-            System.out.println("Solde actuel: " + compte.getSolde() + " DH");
-            System.out.println("\n=== HISTORIQUE DES TRANSACTIONS ===");
-            
-            if(compte.getHistoriquetransacions().isEmpty()) {
-                System.out.println("Aucune transaction effectuée");
-            } else {
-                for(Transacion transaction : compte.getHistoriquetransacions()) {
-                    System.out.println("─────────────────────────────────");
-                    System.out.println("ID: " + transaction.getIdTransaction());
-                    System.out.println("Type: " + transaction.getType());
-                    System.out.println("Montant: " + transaction.getMontant() + " DH");
-                    
-                    if(transaction.getCompteSource() != null && !transaction.getCompteSource().equals(compte)) {
-                        System.out.println("De: " + transaction.getCompteSource().getNumeroCompte());
-                    }
-                    if(transaction.getComptedestination() != null && !transaction.getComptedestination().equals(compte)) {
-                        System.out.println("Vers: " + transaction.getComptedestination().getNumeroCompte());
-                    }
-                }
-            }
-            System.out.println("═══════════════════════════════════");
+        HashMap<String, Compte> comptes = client.getComptes();
+        Compte compte = comptes.get(numeroCompte);
+        if (compte == null) {
+            System.out.println("Erreur : Compte non trouvé !");
+            return;
+        }
+        System.out.println("===== Relevé du Compte " + numeroCompte + " =====");
+        System.out.println("Type de compte : " + compte.getTypeCompte());
+        System.out.println("Solde actuel : " + compte.getSolde() + " DH");
+        ArrayList<model.Transacion> historique = compte.getHistoriquetransacions();
+        if (historique.isEmpty()) {
+            System.out.println("Aucune transaction trouvée.");
         } else {
-            System.out.println("Compte inexistant");
+            System.out.println("Historique des transactions :");
+            for (model.Transacion transaction : historique) {
+                System.out.println(transaction.getDate().toLocalDate() +  " | " + transaction.getType() + " | " + transaction.getMontant() + " DH" +" | ID: " + transaction.getIdTransaction());
+            }
         }
     }
 
+    public boolean cloturerCompte(String emailOuId, String numeroCompte) {
+    Client client = null;
+    for (Client c : clients) {
+        if (c.getEmail().equals(emailOuId) || c.getIdClient().equals(emailOuId)) {
+            client = c;
+            break;
+        }
+    }
+    if (client == null) {
+        System.out.println("Erreur : Client non trouvé !");
+        return false;
+    }
+    HashMap<String, Compte> comptes = client.getComptes();
+    if (comptes.containsKey(numeroCompte)) {
+        comptes.remove(numeroCompte);
+        System.out.println("Compte " + numeroCompte + " clôturé avec succès !");
+        return true;
+    } else {
+        System.out.println("Erreur : Compte non trouvé !");
+        return false;
+    }
+}
+
+    public Client enregistrerClientParGestionnaire(String nom, String prenom, String email, String motDePasse, String typeCompte) {
+        for (Client client : clients) {
+            if (client.getEmail().equals(email)) {
+                System.out.println("Erreur : Un client avec cet email existe déjà !");
+                return null;
+            }
+        }
+        Client nouveauClient = new Client(nom, prenom, email, motDePasse);
+        clients.add(nouveauClient);        
+        String numeroCompte = genererNumeroCompte();
+        Compte nouveauCompte = new Compte(numeroCompte, typeCompte);
+        HashMap<String, Compte> comptes = nouveauClient.getComptes();
+        comptes.put(numeroCompte, nouveauCompte);
+        System.out.println("===== Enregistrement Client =====");
+        System.out.println("Client créé avec succès !");
+        System.out.println("Nom : " + nom + " " + prenom);
+        System.out.println("Email : " + email);
+        System.out.println("ID Client : " + nouveauClient.getIdClient());
+        System.out.println("Compte créé : " + numeroCompte + " (" + typeCompte + ")");
+        System.out.println("Solde initial : 0.0 DH");
+        System.out.println("================================");
+        return nouveauClient;
+    }
 }

@@ -29,6 +29,10 @@ public class Transacion {
     public double getMontant(){
         return montant;
     }
+    
+    public LocalDateTime getDate(){
+        return date;
+    }
 
     public Compte getComptedestination() {
         return comptedestination;
